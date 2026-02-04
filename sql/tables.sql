@@ -112,6 +112,7 @@ CREATE TABLE IF NOT EXISTS product_order(
    id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
    product_id INTEGER NOT NULL,
    order_id INTEGER NOT NULL,
+   quantity INTEGER NOT NULL,
    FOREIGN KEY (product_id) REFERENCES product(id),
    FOREIGN KEY (order_id) REFERENCES "order"(id)
 );
