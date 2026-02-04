@@ -68,42 +68,29 @@ CREATE TABLE IF NOT EXISTS "order"(
    FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
-CREATE TABLE IF NOT EXISTS supplier(
-   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
-   social_name VARCHAR(50) NOT NULL,
-   cnpj VARCHAR(14) UNIQUE NOT NULL,
-   contact VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS product_supplier(
-   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
-   product_id INTEGER NOT NULL,
-   supplier_id INTEGER NOT NULL,
-   FOREIGN KEY (product_id) REFERENCES product(id),
-   FOREIGN KEY (supplier_id) REFERENCES supplier(id)
-);
-
-CREATE TABLE IF NOT EXISTS seller(
+CREATE TABLE IF NOT EXISTS seller_supplier(
    id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
    social_name VARCHAR(50) NOT NULL,
    cnpj VARCHAR(14) UNIQUE NOT NULL,
    contact VARCHAR(50) NOT NULL,
+   email VARCHAR(50) NOT NULL,
+   type VARCHAR(50) NOT NULL CHECK (type in ('SUPPLIER', 'SELLER', 'BOTH')),
    address VARCHAR(100) NOT NULL,
    city VARCHAR(50) NOT NULL,
    state VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS product_seller(
+CREATE TABLE IF NOT EXISTS product_seller_supplier(
    id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
    product_id INTEGER NOT NULL,
-   seller_id INTEGER NOT NULL,
+   seller_supplier_id INTEGER NOT NULL,
    FOREIGN KEY (product_id) REFERENCES product(id),
-   FOREIGN KEY (seller_id) REFERENCES seller(id)
+   FOREIGN KEY (seller_supplier_id) REFERENCES seller_supplier(id)
 );
 
 CREATE TABLE IF NOT EXISTS payment(
    id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
-   payment_type VARCHAR(50) check (payment_type in ('CASH', 'DEBIT', 'CREDIT', 'PIX')) NOT NULL,
+   payment_type VARCHAR(50) check (payment_type in ('CASH', 'DEBIT', 'CREDIT', 'PIX', 'VOUCHER', 'MONEY_TRANSFER','BANK_SLIP')) NOT NULL,
    order_id INTEGER NOT NULL,
    FOREIGN KEY (order_id) REFERENCES "order"(id)
 );

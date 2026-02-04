@@ -18,6 +18,8 @@ CATEGORY_DESC = ["Roupas casuais", "Acessorios", "Tecnologia", "Esportes", "Casa
 ORDER_DESC = ["Compra online", "Compra express", "Compra promocional", "Compra em lote"]
 SUPPLIER_NAMES = ["Fornecedor Alpha", "Fornecedor Beta", "Fornecedor Gamma", "Fornecedor Delta"]
 SELLER_NAMES = ["Vendedor Centro", "Vendedor Sul", "Vendedor Norte", "Vendedor Leste"]
+SELLER_SUPPLIER_NAMES = SUPPLIER_NAMES + SELLER_NAMES
+SELLER_SUPPLIER_TYPES = ["SUPPLIER", "SELLER", "BOTH"]
 
 
 def rand_digits(n):
@@ -258,118 +260,75 @@ def insert_data():
             )
             order2_id = cur.fetchone()[0]
 
-            # Suppliers
+            # Seller/Supplier
             cur.execute(
                 """
-                INSERT INTO supplier (social_name, cnpj, contact)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (cnpj) DO UPDATE SET
-                    social_name = EXCLUDED.social_name,
-                    contact = EXCLUDED.contact
-                RETURNING id
-                """,
-                (
-                    random.choice(SUPPLIER_NAMES),
-                    rand_digits(14),
-                    f"contato{rand_digits(4)}@supplier.com",
-                ),
-            )
-            supplier1_id = cur.fetchone()[0]
-
-            cur.execute(
-                """
-                INSERT INTO supplier (social_name, cnpj, contact)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (cnpj) DO UPDATE SET
-                    social_name = EXCLUDED.social_name,
-                    contact = EXCLUDED.contact
-                RETURNING id
-                """,
-                (
-                    random.choice(SUPPLIER_NAMES),
-                    rand_digits(14),
-                    f"contato{rand_digits(4)}@supplier.com",
-                ),
-            )
-            supplier2_id = cur.fetchone()[0]
-
-            # Product supplier
-            cur.execute(
-                """
-                INSERT INTO product_supplier (product_id, supplier_id)
-                VALUES (%s, %s)
-                """,
-                (product1_id, supplier1_id),
-            )
-            cur.execute(
-                """
-                INSERT INTO product_supplier (product_id, supplier_id)
-                VALUES (%s, %s)
-                """,
-                (product2_id, supplier2_id),
-            )
-
-            # Sellers
-            cur.execute(
-                """
-                INSERT INTO seller (social_name, cnpj, contact, address, city, state)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO seller_supplier (social_name, cnpj, contact, email, type, address, city, state)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (cnpj) DO UPDATE SET
                     social_name = EXCLUDED.social_name,
                     contact = EXCLUDED.contact,
+                    email = EXCLUDED.email,
+                    type = EXCLUDED.type,
                     address = EXCLUDED.address,
                     city = EXCLUDED.city,
                     state = EXCLUDED.state
                 RETURNING id
                 """,
                 (
-                    random.choice(SELLER_NAMES),
+                    random.choice(SELLER_SUPPLIER_NAMES),
                     rand_digits(14),
-                    f"vendedor{rand_digits(4)}@seller.com",
+                    rand_phone(),
+                    rand_email(),
+                    random.choice(SELLER_SUPPLIER_TYPES),
                     rand_address(),
                     random.choice(CITIES),
                     random.choice(STATES),
                 ),
             )
-            seller1_id = cur.fetchone()[0]
+            seller_supplier1_id = cur.fetchone()[0]
 
             cur.execute(
                 """
-                INSERT INTO seller (social_name, cnpj, contact, address, city, state)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO seller_supplier (social_name, cnpj, contact, email, type, address, city, state)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (cnpj) DO UPDATE SET
                     social_name = EXCLUDED.social_name,
                     contact = EXCLUDED.contact,
+                    email = EXCLUDED.email,
+                    type = EXCLUDED.type,
                     address = EXCLUDED.address,
                     city = EXCLUDED.city,
                     state = EXCLUDED.state
                 RETURNING id
                 """,
                 (
-                    random.choice(SELLER_NAMES),
+                    random.choice(SELLER_SUPPLIER_NAMES),
                     rand_digits(14),
-                    f"vendedor{rand_digits(4)}@seller.com",
+                    rand_phone(),
+                    rand_email(),
+                    random.choice(SELLER_SUPPLIER_TYPES),
                     rand_address(),
                     random.choice(CITIES),
                     random.choice(STATES),
                 ),
             )
-            seller2_id = cur.fetchone()[0]
+            seller_supplier2_id = cur.fetchone()[0]
 
-            # Product seller
+            # Product seller/supplier
             cur.execute(
                 """
-                INSERT INTO product_seller (product_id, seller_id)
+                INSERT INTO product_seller_supplier (product_id, seller_supplier_id)
                 VALUES (%s, %s)
                 """,
-                (product1_id, seller1_id),
+                (product1_id, seller_supplier1_id),
             )
             cur.execute(
                 """
-                INSERT INTO product_seller (product_id, seller_id)
+                INSERT INTO product_seller_supplier (product_id, seller_supplier_id)
                 VALUES (%s, %s)
                 """,
-                (product2_id, seller2_id),
+                (product2_id, seller_supplier2_id),
             )
 
             # Payments
@@ -429,6 +388,7 @@ def insert_data():
         f"individual_customer={individual_id}",
         f"corporate_customer={corporate_id}",
         f"products=({product1_id}, {product2_id})",
+        f"seller_supplier=({seller_supplier1_id}, {seller_supplier2_id})",
         f"orders=({order1_id}, {order2_id})",
     )
 

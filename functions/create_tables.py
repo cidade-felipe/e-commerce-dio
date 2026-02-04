@@ -45,6 +45,5 @@ if __name__ == "__main__":
     conn_info = connect_to_db()
     created_tables = create_tables(conn_info, file,'public')
     for table in created_tables:
-        print(f'Creating table: {table}')
-    
+        print(f'Creating table: {table}') 
 
