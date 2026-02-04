@@ -391,17 +391,17 @@ def insert_data():
             # Product order
             cur.execute(
                 """
-                INSERT INTO product_order (product_id, order_id)
-                VALUES (%s, %s)
+                INSERT INTO product_order (product_id, order_id, quantity)
+                VALUES (%s, %s, %s)
                 """,
-                (product1_id, order1_id),
+                (product1_id, order1_id, random.randint(1, 10)),
             )
             cur.execute(
                 """
-                INSERT INTO product_order (product_id, order_id)
-                VALUES (%s, %s)
+                INSERT INTO product_order (product_id, order_id, quantity)
+                VALUES (%s, %s, %s)
                 """,
-                (product2_id, order2_id),
+                (product2_id, order2_id, random.randint(1, 10)),
             )
 
             # Delivery
