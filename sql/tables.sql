@@ -1,0 +1,125 @@
+CREATE TABLE IF NOT EXISTS client(
+   id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+   email VARCHAR(50) UNIQUE NOT NULL,
+   phone VARCHAR(50) NOT NULL,
+   address VARCHAR(100) NOT NULL,
+   city VARCHAR(50) NOT NULL,
+   state VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS individual_customer(
+   id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+   client_id INTEGER NOT NULL,
+   fname VARCHAR(50) NOT NULL,
+   mname VARCHAR(50),
+   lname VARCHAR(50) NOT NULL,
+   cpf VARCHAR(11) UNIQUE NOT NULL,
+   FOREIGN KEY (client_id) REFERENCES client(id)
+);
+
+CREATE TABLE IF NOT EXISTS corporate_customer(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   client_id INTEGER NOT NULL,
+   corporate_name VARCHAR(50) NOT NULL,
+   cnpj VARCHAR(14) UNIQUE NOT NULL,
+   FOREIGN KEY (client_id) REFERENCES client(id)
+);
+
+CREATE TABLE IF NOT EXISTS category(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   review_score NUMERIC(3,2) DEFAULT 0.0,
+   size VARCHAR(50),
+   description TEXT
+);
+
+CREATE TABLE IF NOT EXISTS product(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   client_id INTEGER NOT NULL,
+   category_id INTEGER NOT NULL,
+   name VARCHAR(50) NOT NULL,
+   price DECIMAL(10,2) NOT NULL,
+   classification_kids BOOLEAN NOT NULL,
+   FOREIGN KEY (category_id) REFERENCES category(id),
+   FOREIGN KEY (client_id) REFERENCES client(id)
+);
+
+CREATE TABLE IF NOT EXISTS stock(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   place VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS product_stock(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   product_id INTEGER NOT NULL,
+   stock_id INTEGER NOT NULL,
+   quantity INTEGER NOT NULL,
+   FOREIGN KEY (product_id) REFERENCES product(id),
+   FOREIGN KEY (stock_id) REFERENCES stock(id)
+);
+
+CREATE TABLE IF NOT EXISTS "order"(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   order_status VARCHAR(50) check (order_status in ('DELIVERED', 'PENDING', 'CANCELLED')) DEFAULT 'PENDING',
+   order_description TEXT,
+   send_value DECIMAL(10,2) NOT NULL,
+   client_id INTEGER NOT NULL,
+   product_id INTEGER NOT NULL,
+   FOREIGN KEY (client_id) REFERENCES client(id),
+   FOREIGN KEY (product_id) REFERENCES product(id)
+);
+
+CREATE TABLE IF NOT EXISTS supplier(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   social_name VARCHAR(50) NOT NULL,
+   cnpj VARCHAR(14) UNIQUE NOT NULL,
+   contact VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS product_supplier(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   product_id INTEGER NOT NULL,
+   supplier_id INTEGER NOT NULL,
+   FOREIGN KEY (product_id) REFERENCES product(id),
+   FOREIGN KEY (supplier_id) REFERENCES supplier(id)
+);
+
+CREATE TABLE IF NOT EXISTS seller(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   social_name VARCHAR(50) NOT NULL,
+   cnpj VARCHAR(14) UNIQUE NOT NULL,
+   contact VARCHAR(50) NOT NULL,
+   address VARCHAR(100) NOT NULL,
+   city VARCHAR(50) NOT NULL,
+   state VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS product_seller(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   product_id INTEGER NOT NULL,
+   seller_id INTEGER NOT NULL,
+   FOREIGN KEY (product_id) REFERENCES product(id),
+   FOREIGN KEY (seller_id) REFERENCES seller(id)
+);
+
+CREATE TABLE IF NOT EXISTS payment(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   payment_type VARCHAR(50) check (payment_type in ('CASH', 'DEBIT', 'CREDIT', 'PIX')) NOT NULL,
+   order_id INTEGER NOT NULL,
+   FOREIGN KEY (order_id) REFERENCES "order"(id)
+);
+
+CREATE TABLE IF NOT EXISTS product_order(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   product_id INTEGER NOT NULL,
+   order_id INTEGER NOT NULL,
+   FOREIGN KEY (product_id) REFERENCES product(id),
+   FOREIGN KEY (order_id) REFERENCES "order"(id)
+);
+
+CREATE TABLE IF NOT EXISTS delivery(
+   id INTEGER GENERATED AlWAYS AS IDENTITY PRIMARY KEY,
+   order_id INTEGER NOT NULL,
+   status VARCHAR(50) check (status in ('DELIVERED', 'PENDING', 'CANCELLED')) DEFAULT 'PENDING',
+   tracking_code VARCHAR(50) NOT NULL,
+   FOREIGN KEY (order_id) REFERENCES "order"(id)
+);
