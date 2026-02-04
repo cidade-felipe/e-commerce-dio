@@ -76,6 +76,129 @@ python functions/drop_tables.py
 - `product_order`
 - `delivery`
 
+**Diagrama ER (Mermaid)**
+
+`ORDER` representa a tabela `"order"`.
+
+```mermaid
+erDiagram
+  CLIENT {
+    int id PK
+    varchar email
+    varchar phone
+    varchar address
+    varchar city
+    varchar state
+  }
+
+  INDIVIDUAL_CUSTOMER {
+    int id PK
+    int client_id FK
+    varchar fname
+    varchar mname
+    varchar lname
+    varchar cpf
+  }
+
+  CORPORATE_CUSTOMER {
+    int id PK
+    int client_id FK
+    varchar corporate_name
+    varchar cnpj
+  }
+
+  CATEGORY {
+    int id PK
+    numeric review_score
+    varchar size
+    text description
+  }
+
+  PRODUCT {
+    int id PK
+    int client_id FK
+    int category_id FK
+    varchar name
+    decimal price
+    boolean classification_kids
+  }
+
+  STOCK {
+    int id PK
+    varchar place
+  }
+
+  PRODUCT_STOCK {
+    int id PK
+    int product_id FK
+    int stock_id FK
+    int quantity
+  }
+
+  ORDER {
+    int id PK
+    varchar order_status
+    text order_description
+    decimal send_value
+    int client_id FK
+    int product_id FK
+  }
+
+  SELLER_SUPPLIER {
+    int id PK
+    varchar social_name
+    varchar cnpj
+    varchar contact
+    varchar email
+    varchar type
+    varchar address
+    varchar city
+    varchar state
+  }
+
+  PRODUCT_SELLER_SUPPLIER {
+    int id PK
+    int product_id FK
+    int seller_supplier_id FK
+  }
+
+  PAYMENT {
+    int id PK
+    varchar payment_type
+    int order_id FK
+  }
+
+  PRODUCT_ORDER {
+    int id PK
+    int product_id FK
+    int order_id FK
+    int quantity
+  }
+
+  DELIVERY {
+    int id PK
+    int order_id FK
+    varchar status
+    varchar tracking_code
+  }
+
+  CLIENT ||--o{ INDIVIDUAL_CUSTOMER : has
+  CLIENT ||--o{ CORPORATE_CUSTOMER : has
+  CLIENT ||--o{ PRODUCT : lists
+  CATEGORY ||--o{ PRODUCT : groups
+  PRODUCT ||--o{ PRODUCT_STOCK : stocked_in
+  STOCK ||--o{ PRODUCT_STOCK : stores
+  CLIENT ||--o{ ORDER : places
+  PRODUCT ||--o{ ORDER : includes
+  PRODUCT ||--o{ PRODUCT_ORDER : item
+  ORDER ||--o{ PRODUCT_ORDER : contains
+  SELLER_SUPPLIER ||--o{ PRODUCT_SELLER_SUPPLIER : provides
+  PRODUCT ||--o{ PRODUCT_SELLER_SUPPLIER : supplied_by
+  ORDER ||--o{ PAYMENT : paid_by
+  ORDER ||--o{ DELIVERY : ships
+  
+```
+
 **Queries (notebooks/queries.ipynb)**
 `query1`
 
